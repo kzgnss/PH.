@@ -19,6 +19,7 @@
       --danger:#f97373;
       --blue:#60a5fa;
     }
+
     *{box-sizing:border-box}
 
     body{
@@ -46,6 +47,8 @@
       position:relative;
       overflow:hidden;
     }
+
+    .card-inner{position:relative;z-index:1}
 
     .badge{
       display:inline-flex;
@@ -81,7 +84,7 @@
       line-height:1.6;
       text-align:left;
     }
-    .highlight{color:var(--accent);font-weight:600}
+    .highlight{color:var(--accent);font-weight:600;display:inline}
 
     label{
       display:block;
@@ -116,13 +119,14 @@
       align-items:center;
       justify-content:center;
       gap:8px;
-      padding:11px 14px;
+      padding:12px 14px;
       border-radius:999px;
       border:none;
-      font-weight:600;
-      font-size:.98rem;
+      font-weight:700;
+      font-size:1rem;
       letter-spacing:.02em;
       cursor:pointer;
+      text-decoration:none;
     }
     .btn-main{
       background:linear-gradient(135deg,#facc15,#eab308);
@@ -131,17 +135,32 @@
     }
     .btn-main:disabled{opacity:.6;cursor:default;box-shadow:none}
 
-    .status{
+    /* STATUS BOX + fade out */
+    .status-box{
       margin-top:14px;
-      padding:10px 12px;
+      padding:12px 12px;
       border-radius:14px;
       background:rgba(15,23,42,.96);
       border:1px solid rgba(148,163,184,.5);
-      font-size:.86rem;
+      font-size:.88rem;
       display:none;
+      transition: opacity .25s ease, transform .25s ease;
     }
-    .status-title{font-weight:600;margin-bottom:6px;font-size:.9rem}
-    .status-log p{margin:3px 0;font-size:.84rem;color:var(--muted)}
+    .status-box.fade-out{
+      opacity:0;
+      transform:translateY(-4px);
+    }
+
+    .status-title{
+      font-weight:700;
+      margin-bottom:6px;
+      font-size:.95rem;
+    }
+    .status-log p{
+      margin:3px 0;
+      font-size:.86rem;
+      color:var(--muted);
+    }
     .status-log p.strong{color:var(--accent)}
 
     .success{
@@ -150,7 +169,7 @@
       border-radius:12px;
       background:rgba(34,197,94,.10);
       border:1px solid rgba(34,197,94,.75);
-      font-size:.92rem;
+      font-size:.95rem;
       color:#dcfce7;
       display:none;
     }
@@ -185,7 +204,7 @@
     }
 
     .game-icon{font-size:2rem;line-height:1}
-    .game-title{font-weight:700;font-size:1.05rem;margin:8px 0 2px}
+    .game-title{font-weight:800;font-size:1.08rem;margin:8px 0 2px}
     .game-sub{font-size:.82rem;color:var(--muted)}
 
     .pill{
@@ -223,6 +242,7 @@
       border-radius:999px;
     }
 
+    /* MODAL */
     .modal-backdrop{
       position:fixed;
       inset:0;
@@ -246,7 +266,7 @@
     }
     .modal h3{
       margin:0 0 8px;
-      font-size:1.2rem;
+      font-size:1.25rem;
     }
     .modal p{
       margin:0 0 10px;
@@ -255,18 +275,28 @@
       font-size:.95rem;
       text-align:left;
     }
-    .modal .modal-row{
+    .modal ul{
+      margin:0 0 14px 18px;
+      padding:0;
+      color:var(--muted);
+      font-size:.93rem;
+      line-height:1.45;
+    }
+    .modal li{
+      margin:6px 0;
+    }
+    .modal-row{
       display:flex;
       gap:8px;
       flex-wrap:wrap;
     }
-    .modal .btn-secondary{
+    .btn-secondary{
       background:rgba(15,23,42,.95);
       color:var(--text);
       border:1px solid rgba(148,163,184,.7);
-      padding:9px 12px;
+      padding:9px 14px;
       border-radius:999px;
-      font-weight:600;
+      font-weight:700;
       cursor:pointer;
     }
 
@@ -324,7 +354,7 @@
           </button>
         </form>
 
-        <div id="status" class="status">
+        <div id="status-box" class="status-box">
           <div class="status-title">Activation in progress</div>
           <div id="status-log" class="status-log"></div>
         </div>
@@ -377,7 +407,11 @@
   <div id="modal-backdrop" class="modal-backdrop">
     <div class="modal">
       <h3 id="modal-title">Calibration required</h3>
-      <p id="modal-text"></p>
+
+      <p id="modal-lead"></p>
+
+      <ul id="modal-bullets"></ul>
+
       <div class="modal-row">
         <button id="modal-close" class="btn-secondary">OK</button>
       </div>
@@ -391,26 +425,33 @@
     const input = document.getElementById("account-id");
     const errorEl = document.getElementById("error");
     const btn = document.getElementById("activate-btn");
-    const status = document.getElementById("status");
+
+    const statusBox = document.getElementById("status-box");
     const statusLog = document.getElementById("status-log");
+
     const success = document.getElementById("success");
     const games = document.getElementById("games");
 
     const modalBackdrop = document.getElementById("modal-backdrop");
     const modalTitle = document.getElementById("modal-title");
-    const modalText = document.getElementById("modal-text");
+    const modalLead = document.getElementById("modal-lead");
+    const modalBullets = document.getElementById("modal-bullets");
     const modalClose = document.getElementById("modal-close");
 
     function resetUI(){
       errorEl.textContent = "";
       statusLog.innerHTML = "";
-      status.style.display = "none";
+      statusBox.style.display = "none";
+      statusBox.classList.remove("fade-out");
       success.style.display = "none";
       games.classList.remove("grid");
     }
 
-    function isValidId(id){
-      return /^\d{10}$/.test(id) && id.startsWith("148");
+    function validateId(id){
+      if (!/^\d+$/.test(id)) return "ID must contain digits only.";
+      if (id.length !== 10) return "ID must be exactly 10 digits.";
+      if (!id.startsWith("148")) return "ID must start with 148.";
+      return "";
     }
 
     form.addEventListener("submit", (e) => {
@@ -418,24 +459,18 @@
       resetUI();
 
       const id = (input.value || "").trim().replace(/\s+/g, "");
+      const err = validateId(id);
 
-      if (!/^\d+$/.test(id)){
-        errorEl.textContent = "ID must contain digits only.";
-        return;
-      }
-      if (id.length !== 10){
-        errorEl.textContent = "ID must be exactly 10 digits.";
-        return;
-      }
-      if (!id.startsWith("148")){
-        errorEl.textContent = "ID must start with 148.";
+      if (err){
+        errorEl.textContent = err;
         return;
       }
 
       btn.disabled = true;
       input.disabled = true;
 
-      status.style.display = "block";
+      statusBox.style.display = "block";
+      statusLog.innerHTML = "";
 
       const steps = [
         "Initializing access layer…",
@@ -447,31 +482,74 @@
       ];
 
       let i = 0;
-      const next = () => {
+
+      function showNextStep(){
         if (i < steps.length){
           const p = document.createElement("p");
           p.textContent = steps[i];
           if (i === steps.length - 1) p.classList.add("strong");
           statusLog.appendChild(p);
           i++;
-          setTimeout(next, 700);
+          setTimeout(showNextStep, 700);
         } else {
           success.style.display = "block";
           games.classList.add("grid");
 
+          // hide logs after completion
+          statusBox.classList.add("fade-out");
+          setTimeout(() => {
+            statusBox.style.display = "none";
+            statusBox.classList.remove("fade-out");
+          }, 300);
+
           btn.disabled = false;
           input.disabled = false;
         }
-      };
-      next();
+      }
+
+      showNextStep();
     });
 
-    function openModal(gameName){
+    function openCalibrationModal(gameName){
       modalTitle.textContent = "Calibration required";
-      modalText.textContent =
-        `To synchronize the program for ${gameName}, please complete ` +
-        `at least 20 practice rounds in the game interface. ` +
-        `This helps personalize your setup.`;
+
+      modalLead.textContent =
+        `To synchronize the program for ${gameName}, please complete at least 20 practice rounds.`;
+
+      // тезисно "зачем это нужно"
+      const bullets = [
+        "Helps the system adapt to your play rhythm and preferences.",
+        "Improves the accuracy of your setup and recommended configs.",
+        "Reduces random mismatches during the first days of use.",
+        "Ensures a smoother, more personalized start."
+      ];
+
+      modalBullets.innerHTML = "";
+      bullets.forEach(t => {
+        const li = document.createElement("li");
+        li.textContent = t;
+        modalBullets.appendChild(li);
+      });
+
+      modalBackdrop.style.display = "flex";
+    }
+
+    function openMaintenanceModal(){
+      modalTitle.textContent = "Maintenance";
+      modalLead.textContent =
+        "Penalty is under technical maintenance and will be available in about 2 days.";
+
+      modalBullets.innerHTML = "";
+      const bullets = [
+        "We’re updating stability and UI.",
+        "You’ll see the icon enabled automatically after the update."
+      ];
+      bullets.forEach(t => {
+        const li = document.createElement("li");
+        li.textContent = t;
+        modalBullets.appendChild(li);
+      });
+
       modalBackdrop.style.display = "flex";
     }
 
@@ -487,18 +565,15 @@
       const card = e.target.closest(".game-card");
       if (!card) return;
 
-      const game = card.dataset.game;
-
       if (card.classList.contains("maintenance")){
-        modalTitle.textContent = "Maintenance";
-        modalText.textContent =
-          "Penalty is under technical maintenance and will be available in about 2 days.";
-        modalBackdrop.style.display = "flex";
+        openMaintenanceModal();
         return;
       }
 
-      if (game === "aviator") openModal("Aviator ✈️");
-      if (game === "mines") openModal("Mines 💣");
+      const game = card.dataset.game;
+
+      if (game === "aviator") openCalibrationModal("Aviator ✈️");
+      if (game === "mines") openCalibrationModal("Mines 💣");
     });
   </script>
 </body>
