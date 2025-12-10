@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Access Activation · Game Setup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root{
+      --bg:#020617;
+      --card:#020617;
+      --accent:#facc15;
+      --accent-soft:rgba(250,204,21,.12);
+      --accent-border:rgba(250,204,21,.6);
+      --text:#f9fafb;
+      --muted:#9ca3af;
+      --border:rgba(148,163,184,.25);
+      --ok:#22c55e;
+      --danger:#f97373;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background: radial-gradient(circle at top, #0f172a 0, #020617 45%, #000 100%);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+
+    .page{width:100%;max-width:560px}
+
+    .card{
+      background:
+        radial-gradient(circle at top left, var(--accent-soft), transparent 55%),
+        var(--card);
+      border-radius:24px;
+      border:1px solid var(--border);
+      box-shadow:0 22px 40px rgba(0,0,0,.6);
+      padding:22px 20px 20px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:5px 10px;
+      border-radius:999px;
+      background:rgba(15,23,42,.9);
+      border:1px solid rgba(148,163,184,.4);
+      font-size:.75rem;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
+
+    .dot{
+      width:7px;height:7px;border-radius:999px;
+      background:var(--ok);
+      box-shadow:0 0 0 5px rgba(34,197,94,.2);
+    }
+
+    h1{
+      margin:0 0 8px;
+      font-size:1.5rem;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    h1 .icon{font-size:1.6rem}
+
+    .subtitle{
+      margin:0 0 16px;
+      font-size:.93rem;
+      color:var(--muted);
+      line-height:1.6;
+      text-align:left;
+    }
+
+    .highlight{color:var(--accent);font-weight:600}
+
+    label{
+      display:block;
+      font-size:.85rem;
+      margin-bottom:6px;
+    }
+
+    .input-row{margin-bottom:10px}
+
+    input[type="text"]{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.95);
+      color:var(--text);
+      font-size:.95rem;
+      outline:none;
+    }
+
+    input::placeholder{color:#6b7280}
+
+    .error{
+      margin-top:4px;
+      font-size:.8rem;
+      color:#fecaca;
+      min-height:1em;
+    }
+
+    .btn{
+      width:100%;
+      margin-top:8px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:11px 14px;
+      border-radius:999px;
+      border:none;
+      font-weight:600;
+      font-size:.95rem;
+      letter-spacing:.02em;
+      cursor:pointer;
+      text-decoration:none;
+    }
+
+    .btn-main{
+      background:linear-gradient(135deg,#facc15,#eab308);
+      color:#020617;
+      box-shadow:0 16px 30px rgba(250,204,21,.35);
+    }
+
+    .btn-main:disabled{opacity:.6;cursor:default;box-shadow:none}
+
+    .status{
+      margin-top:14px;
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(15,23,42,.96);
+      border:1px solid rgba(148,163,184,.5);
+      font-size:.86rem;
+      display:none;
+    }
+
+    .status-title{
+      font-weight:600;
+      margin-bottom:6px;
+      font-size:.9rem;
+    }
+
+    .status-log p{
+      margin:3px 0;
+      font-size:.84rem;
+      color:var(--muted);
+    }
+    .status-log p.strong{color:var(--accent)}
+
+    .success{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:rgba(34,197,94,.10);
+      border:1px solid rgba(34,197,94,.75);
+      font-size:.9rem;
+      color:#dcfce7;
+      display:none;
+    }
+
+    .games{
+      margin-top:14px;
+      display:none;
+      gap:10px;
+      grid-template-columns:1fr 1fr;
+    }
+    .games.grid{display:grid}
+
+    .game-card{
+      border-radius:16px;
+      padding:14px 12px;
+      background:
+        radial-gradient(circle at top left, rgba(250,204,21,.08), transparent 60%),
+        rgba(15,23,42,.95);
+      border:1px solid rgba(148,163,184,.45);
+      cursor:pointer;
+      transition:transform .15s ease, filter .15s ease, border-color .15s ease;
+      min-height:120px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+
+    .game-card:hover{
+      transform:translateY(-2px);
+      filter:brightness(1.06);
+      border-color:var(--accent-border);
+    }
+
+    .game-icon{
+      font-size:2rem;
+      line-height:1;
+    }
+
+    .game-title{
+      font-weight:700;
+      font-size:1.05rem;
+      margin:8px 0 2px;
+    }
+
+    .game-sub{
+      font-size:.82rem;
+      color:var(--muted);
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:.7rem;
+      border:1px solid rgba(148,163,184,.45);
+      color:var(--muted);
+      width:max-content;
+      margin-top:8px;
+    }
+
+    footer{
+      margin-top:14px;
+      text-align:center;
+      font-size:.7rem;
+      color:var(--muted);
+    }
+
+    /* mobile */
+    @media (max-width:420px){
+      .games.grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <section class="card">
+      <div class="card-inner">
+
+        <div class="badge">
+          <span class="dot"></span>
+          🇵🇭 Philippines · Access Setup
+        </div>
+
+        <h1>
+          <span class="icon">🧩</span>
+          System activation
+        </h1>
+
+        <p class="subtitle">
+          Enter your <span class="highlight">Account ID</span> to activate your access.
+          After activation, choose the game you want to set up first.
+        </p>
+
+        <form id="activation-form">
+          <div class="input-row">
+            <label for="account-id">Account ID</label>
+            <input
+              type="text"
+              id="account-id"
+              maxlength="10"
+              autocomplete="off"
+              placeholder="Example: 1234567890"
+            />
+            <div id="error" class="error"></div>
+          </div>
+
+          <button id="activate-btn" class="btn btn-main" type="submit">
+            <span>✅</span>
+            <span>Activate system</span>
+          </button>
+        </form>
+
+        <div id="status" class="status">
+          <div class="status-title">Activation in progress</div>
+          <div id="status-log" class="status-log"></div>
+        </div>
+
+        <div id="success" class="success">
+          ✅ System activated and ready to use.
+        </div>
+
+        <div id="games" class="games">
+          <div class="game-card" data-game="aviator">
+            <div>
+              <div class="game-icon">✈️</div>
+              <div class="game-title">Aviator</div>
+              <div class="game-sub">Starter setup & daily configs</div>
+              <span class="pill">Recommended first</span>
+            </div>
+            <div class="game-sub">Tap to open</div>
+          </div>
+
+          <div class="game-card" data-game="mines">
+            <div>
+              <div class="game-icon">💣</div>
+              <div class="game-title">Mines</div>
+              <div class="game-sub">Structured patterns & pacing tips</div>
+              <span class="pill">Fast learning curve</span>
+            </div>
+            <div class="game-sub">Tap to open</div>
+          </div>
+        </div>
+
+        <footer>
+          © <span id="year"></span> Access Setup · System activation
+        </footer>
+
+      </div>
+    </section>
+  </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const form = document.getElementById("activation-form");
+    const input = document.getElementById("account-id");
+    const errorEl = document.getElementById("error");
+    const btn = document.getElementById("activate-btn");
+    const status = document.getElementById("status");
+    const statusLog = document.getElementById("status-log");
+    const success = document.getElementById("success");
+    const games = document.getElementById("games");
+
+    function resetUI(){
+      errorEl.textContent = "";
+      statusLog.innerHTML = "";
+      status.style.display = "none";
+      success.style.display = "none";
+      games.classList.remove("grid");
+    }
+
+    function isValidId(id){
+      // Безопасно и нейтрально: просто 10 цифр
+      return /^\d{10}$/.test(id);
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      resetUI();
+
+      const id = (input.value || "").trim().replace(/\s+/g, "");
+
+      if (!/^\d+$/.test(id)){
+        errorEl.textContent = "ID must contain digits only.";
+        return;
+      }
+
+      if (!isValidId(id)){
+        errorEl.textContent = "Your ID should be exactly 10 digits.";
+        return;
+      }
+
+      btn.disabled = true;
+      input.disabled = true;
+
+      status.style.display = "block";
+
+      const steps = [
+        "Checking your ID…",
+        "Preparing your access profile…",
+        "Finalizing activation…"
+      ];
+
+      let i = 0;
+      const next = () => {
+        if (i < steps.length){
+          const p = document.createElement("p");
+          p.textContent = steps[i];
+          if (i === steps.length - 1) p.classList.add("strong");
+          statusLog.appendChild(p);
+          i++;
+          setTimeout(next, 700);
+        } else {
+          success.style.display = "block";
+          games.classList.add("grid");
+
+          btn.disabled = false;
+          input.disabled = false;
+        }
+      };
+      next();
+    });
+
+    // Клики по карточкам игр
+    games.addEventListener("click", (e) => {
+      const card = e.target.closest(".game-card");
+      if (!card) return;
+
+      const game = card.dataset.game;
+
+      // Заглушка. Заменишь на свою реальную логику/страницу
+      if (game === "aviator") {
+        alert("Aviator setup opened. (Replace with your real page or flow)");
+      }
+      if (game === "mines") {
+        alert("Mines setup opened. (Replace with your real page or flow)");
+      }
+    });
+  </script>
+</body>
+</html>
