@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Access Activation · Game Setup</title>
+  <title>Access Activation · Game Calibration</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -17,8 +17,8 @@
       --border:rgba(148,163,184,.25);
       --ok:#22c55e;
       --danger:#f97373;
+      --blue:#60a5fa;
     }
-
     *{box-sizing:border-box}
 
     body{
@@ -33,7 +33,7 @@
       padding:16px;
     }
 
-    .page{width:100%;max-width:560px}
+    .page{width:100%;max-width:620px}
 
     .card{
       background:
@@ -59,7 +59,6 @@
       color:var(--muted);
       margin-bottom:10px;
     }
-
     .dot{
       width:7px;height:7px;border-radius:999px;
       background:var(--ok);
@@ -68,22 +67,20 @@
 
     h1{
       margin:0 0 8px;
-      font-size:1.5rem;
+      font-size:1.6rem;
       display:flex;
       align-items:center;
       gap:10px;
     }
-
     h1 .icon{font-size:1.6rem}
 
     .subtitle{
       margin:0 0 16px;
-      font-size:.93rem;
+      font-size:.95rem;
       color:var(--muted);
       line-height:1.6;
       text-align:left;
     }
-
     .highlight{color:var(--accent);font-weight:600}
 
     label{
@@ -91,7 +88,6 @@
       font-size:.85rem;
       margin-bottom:6px;
     }
-
     .input-row{margin-bottom:10px}
 
     input[type="text"]{
@@ -104,7 +100,6 @@
       font-size:.95rem;
       outline:none;
     }
-
     input::placeholder{color:#6b7280}
 
     .error{
@@ -125,18 +120,15 @@
       border-radius:999px;
       border:none;
       font-weight:600;
-      font-size:.95rem;
+      font-size:.98rem;
       letter-spacing:.02em;
       cursor:pointer;
-      text-decoration:none;
     }
-
     .btn-main{
       background:linear-gradient(135deg,#facc15,#eab308);
       color:#020617;
       box-shadow:0 16px 30px rgba(250,204,21,.35);
     }
-
     .btn-main:disabled{opacity:.6;cursor:default;box-shadow:none}
 
     .status{
@@ -148,18 +140,8 @@
       font-size:.86rem;
       display:none;
     }
-
-    .status-title{
-      font-weight:600;
-      margin-bottom:6px;
-      font-size:.9rem;
-    }
-
-    .status-log p{
-      margin:3px 0;
-      font-size:.84rem;
-      color:var(--muted);
-    }
+    .status-title{font-weight:600;margin-bottom:6px;font-size:.9rem}
+    .status-log p{margin:3px 0;font-size:.84rem;color:var(--muted)}
     .status-log p.strong{color:var(--accent)}
 
     .success{
@@ -168,7 +150,7 @@
       border-radius:12px;
       background:rgba(34,197,94,.10);
       border:1px solid rgba(34,197,94,.75);
-      font-size:.9rem;
+      font-size:.92rem;
       color:#dcfce7;
       display:none;
     }
@@ -177,7 +159,7 @@
       margin-top:14px;
       display:none;
       gap:10px;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns:1fr 1fr 1fr;
     }
     .games.grid{display:grid}
 
@@ -188,35 +170,23 @@
         radial-gradient(circle at top left, rgba(250,204,21,.08), transparent 60%),
         rgba(15,23,42,.95);
       border:1px solid rgba(148,163,184,.45);
-      cursor:pointer;
-      transition:transform .15s ease, filter .15s ease, border-color .15s ease;
-      min-height:120px;
+      transition:transform .15s ease, filter .15s ease, border-color .15s ease, opacity .15s ease;
+      min-height:140px;
       display:flex;
       flex-direction:column;
       justify-content:space-between;
+      cursor:pointer;
+      position:relative;
     }
-
     .game-card:hover{
       transform:translateY(-2px);
       filter:brightness(1.06);
       border-color:var(--accent-border);
     }
 
-    .game-icon{
-      font-size:2rem;
-      line-height:1;
-    }
-
-    .game-title{
-      font-weight:700;
-      font-size:1.05rem;
-      margin:8px 0 2px;
-    }
-
-    .game-sub{
-      font-size:.82rem;
-      color:var(--muted);
-    }
+    .game-icon{font-size:2rem;line-height:1}
+    .game-title{font-weight:700;font-size:1.05rem;margin:8px 0 2px}
+    .game-sub{font-size:.82rem;color:var(--muted)}
 
     .pill{
       display:inline-flex;
@@ -231,15 +201,86 @@
       margin-top:8px;
     }
 
+    .maintenance{
+      cursor:not-allowed;
+      opacity:.55;
+      border-style:dashed;
+    }
+    .maintenance:hover{
+      transform:none;
+      filter:none;
+      border-color:rgba(148,163,184,.45);
+    }
+    .maintenance-badge{
+      position:absolute;
+      top:10px;
+      right:10px;
+      background:rgba(96,165,250,.12);
+      border:1px solid rgba(96,165,250,.6);
+      color:#dbeafe;
+      font-size:.65rem;
+      padding:3px 7px;
+      border-radius:999px;
+    }
+
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:50;
+    }
+    .modal{
+      width:100%;
+      max-width:520px;
+      background:
+        radial-gradient(circle at top left, rgba(250,204,21,.10), transparent 55%),
+        #050b1d;
+      border:1px solid rgba(148,163,184,.25);
+      border-radius:18px;
+      padding:18px 16px 16px;
+      box-shadow:0 20px 40px rgba(0,0,0,.65);
+    }
+    .modal h3{
+      margin:0 0 8px;
+      font-size:1.2rem;
+    }
+    .modal p{
+      margin:0 0 10px;
+      color:var(--muted);
+      line-height:1.5;
+      font-size:.95rem;
+      text-align:left;
+    }
+    .modal .modal-row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .modal .btn-secondary{
+      background:rgba(15,23,42,.95);
+      color:var(--text);
+      border:1px solid rgba(148,163,184,.7);
+      padding:9px 12px;
+      border-radius:999px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
     footer{
       margin-top:14px;
       text-align:center;
-      font-size:.7rem;
+      font-size:.72rem;
       color:var(--muted);
     }
 
-    /* mobile */
-    @media (max-width:420px){
+    @media (max-width:520px){
+      .games.grid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:380px){
       .games.grid{grid-template-columns:1fr}
     }
   </style>
@@ -249,7 +290,6 @@
   <div class="page">
     <section class="card">
       <div class="card-inner">
-
         <div class="badge">
           <span class="dot"></span>
           🇵🇭 Philippines · Access Setup
@@ -257,12 +297,12 @@
 
         <h1>
           <span class="icon">🧩</span>
-          System activation
+          Congratulations — your program is ready
         </h1>
 
         <p class="subtitle">
-          Enter your <span class="highlight">Account ID</span> to activate your access.
-          After activation, choose the game you want to set up first.
+          Enter your <span class="highlight">10-digit Account ID</span> that must start with
+          <span class="highlight">148</span>. We’ll run a short activation sequence and unlock game setup.
         </p>
 
         <form id="activation-form">
@@ -273,14 +313,14 @@
               id="account-id"
               maxlength="10"
               autocomplete="off"
-              placeholder="Example: 1234567890"
+              placeholder="Example: 1481234567"
             />
             <div id="error" class="error"></div>
           </div>
 
           <button id="activate-btn" class="btn btn-main" type="submit">
             <span>✅</span>
-            <span>Activate system</span>
+            <span>Activate access</span>
           </button>
         </form>
 
@@ -290,7 +330,7 @@
         </div>
 
         <div id="success" class="success">
-          ✅ System activated and ready to use.
+          ✅ System activated and ready to use. Choose your game below.
         </div>
 
         <div id="games" class="games">
@@ -298,29 +338,50 @@
             <div>
               <div class="game-icon">✈️</div>
               <div class="game-title">Aviator</div>
-              <div class="game-sub">Starter setup & daily configs</div>
-              <span class="pill">Recommended first</span>
+              <div class="game-sub">Starter setup & calibration</div>
+              <span class="pill">Recommended</span>
             </div>
-            <div class="game-sub">Tap to open</div>
+            <div class="game-sub">Tap to continue</div>
           </div>
 
           <div class="game-card" data-game="mines">
             <div>
               <div class="game-icon">💣</div>
               <div class="game-title">Mines</div>
-              <div class="game-sub">Structured patterns & pacing tips</div>
-              <span class="pill">Fast learning curve</span>
+              <div class="game-sub">Structured setup & calibration</div>
+              <span class="pill">Fast setup</span>
             </div>
-            <div class="game-sub">Tap to open</div>
+            <div class="game-sub">Tap to continue</div>
+          </div>
+
+          <div class="game-card maintenance" data-game="penalty" aria-disabled="true">
+            <span class="maintenance-badge">Maintenance · 2 days</span>
+            <div>
+              <div class="game-icon">⚽</div>
+              <div class="game-title">Penalty</div>
+              <div class="game-sub">Technical update in progress</div>
+              <span class="pill">Coming soon</span>
+            </div>
+            <div class="game-sub">Available in 2 days</div>
           </div>
         </div>
 
         <footer>
-          © <span id="year"></span> Access Setup · System activation
+          © <span id="year"></span> Game Setup · Access Activation
         </footer>
-
       </div>
     </section>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal-backdrop" class="modal-backdrop">
+    <div class="modal">
+      <h3 id="modal-title">Calibration required</h3>
+      <p id="modal-text"></p>
+      <div class="modal-row">
+        <button id="modal-close" class="btn-secondary">OK</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -335,6 +396,11 @@
     const success = document.getElementById("success");
     const games = document.getElementById("games");
 
+    const modalBackdrop = document.getElementById("modal-backdrop");
+    const modalTitle = document.getElementById("modal-title");
+    const modalText = document.getElementById("modal-text");
+    const modalClose = document.getElementById("modal-close");
+
     function resetUI(){
       errorEl.textContent = "";
       statusLog.innerHTML = "";
@@ -344,8 +410,7 @@
     }
 
     function isValidId(id){
-      // Безопасно и нейтрально: просто 10 цифр
-      return /^\d{10}$/.test(id);
+      return /^\d{10}$/.test(id) && id.startsWith("148");
     }
 
     form.addEventListener("submit", (e) => {
@@ -358,9 +423,12 @@
         errorEl.textContent = "ID must contain digits only.";
         return;
       }
-
-      if (!isValidId(id)){
-        errorEl.textContent = "Your ID should be exactly 10 digits.";
+      if (id.length !== 10){
+        errorEl.textContent = "ID must be exactly 10 digits.";
+        return;
+      }
+      if (!id.startsWith("148")){
+        errorEl.textContent = "ID must start with 148.";
         return;
       }
 
@@ -370,9 +438,12 @@
       status.style.display = "block";
 
       const steps = [
-        "Checking your ID…",
-        "Preparing your access profile…",
-        "Finalizing activation…"
+        "Initializing access layer…",
+        "Verifying ID format…",
+        "Generating your game profile…",
+        "Loading core modules…",
+        "Syncing setup parameters…",
+        "Activation complete."
       ];
 
       let i = 0;
@@ -395,20 +466,39 @@
       next();
     });
 
-    // Клики по карточкам игр
+    function openModal(gameName){
+      modalTitle.textContent = "Calibration required";
+      modalText.textContent =
+        `To synchronize the program for ${gameName}, please complete ` +
+        `at least 20 practice rounds in the game interface. ` +
+        `This helps personalize your setup.`;
+      modalBackdrop.style.display = "flex";
+    }
+
+    modalClose.addEventListener("click", () => {
+      modalBackdrop.style.display = "none";
+    });
+
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) modalBackdrop.style.display = "none";
+    });
+
     games.addEventListener("click", (e) => {
       const card = e.target.closest(".game-card");
       if (!card) return;
 
       const game = card.dataset.game;
 
-      // Заглушка. Заменишь на свою реальную логику/страницу
-      if (game === "aviator") {
-        alert("Aviator setup opened. (Replace with your real page or flow)");
+      if (card.classList.contains("maintenance")){
+        modalTitle.textContent = "Maintenance";
+        modalText.textContent =
+          "Penalty is under technical maintenance and will be available in about 2 days.";
+        modalBackdrop.style.display = "flex";
+        return;
       }
-      if (game === "mines") {
-        alert("Mines setup opened. (Replace with your real page or flow)");
-      }
+
+      if (game === "aviator") openModal("Aviator ✈️");
+      if (game === "mines") openModal("Mines 💣");
     });
   </script>
 </body>
